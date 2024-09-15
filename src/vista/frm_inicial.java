@@ -4,11 +4,14 @@
  */
 package vista;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
  *
- * @author pluis
+ * @author Keila
  */
 public class frm_inicial extends javax.swing.JFrame {
 
@@ -83,17 +86,28 @@ public class frm_inicial extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPersonaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPersonaActionPerformed
-        frm_persona frm = new frm_persona();
+        frm_persona frm = null;
+        try {
+            frm = new frm_persona();
+        } catch (SQLException ex) {
+            Logger.getLogger(frm_inicial.class.getName()).log(Level.SEVERE, null, ex);
+        }
         frm_inicial inic = new frm_inicial();
         inic.setVisible(false);
         frm.setVisible(true);
     }//GEN-LAST:event_btnPersonaActionPerformed
 
     private void btnDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDocenteActionPerformed
-        frm_docente frm = new frm_docente();
-         JFrame inic = new JFrame("frm_inicial");
-        inic.setVisible(false);
-        frm.setVisible(true);
+        frm_docente frm;
+        try {
+            frm = new frm_docente();
+            JFrame inic = new JFrame("frm_inicial");
+            inic.setVisible(false);
+            frm.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(frm_inicial.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         
     }//GEN-LAST:event_btnDocenteActionPerformed
 
     /**

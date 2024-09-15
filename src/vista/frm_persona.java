@@ -4,17 +4,38 @@
  */
 package vista;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import modelo.Persona;
+import java.awt.Color;
+import modelo.Conexion;
+import java.sql.SQLException;
+import java.sql.ResultSet;import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
- * @author pluis
+ * @author Keila
  */
 public class frm_persona extends javax.swing.JFrame {
 
     /**
      * Creates new form frm_persona
      */
-    public frm_persona() {
+    Persona  obj_persona;
+    public frm_persona()throws SQLException{
         initComponents();
+        obj_persona= new Persona();
+         tblPersona.setModel(obj_persona.leer());
     }
 
     /**
@@ -37,12 +58,12 @@ public class frm_persona extends javax.swing.JFrame {
         btnEditar = new javax.swing.JButton();
         txtNombres = new javax.swing.JTextField();
         btnRegresar = new javax.swing.JButton();
-        txtApelllidos = new javax.swing.JTextField();
+        txtApellidos = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtNit = new javax.swing.JTextField();
         txtDireccion = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        tbTelefono = new javax.swing.JTextField();
+        txtTelefono = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtFechaNacimiento = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -99,6 +120,12 @@ public class frm_persona extends javax.swing.JFrame {
 
         jLabel4.setText("Apellidos");
 
+        txtNit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNitActionPerformed(evt);
+            }
+        });
+
         jLabel5.setText("Dirección");
 
         jLabel6.setText("Telefóno");
@@ -137,11 +164,11 @@ public class frm_persona extends javax.swing.JFrame {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(76, 76, 76)
-                                        .addComponent(txtApelllidos, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(76, 76, 76)
-                                        .addComponent(tbTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
@@ -167,13 +194,13 @@ public class frm_persona extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(txtNit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtNombres, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtApelllidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -181,7 +208,7 @@ public class frm_persona extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(tbTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -218,21 +245,53 @@ public class frm_persona extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-        // TODO add your handling code here:
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date fecha = formato.parse(txtFechaNacimiento.getText());
+            obj_persona=new Persona(txtNit.getText(),txtNombres.getText(),txtApellidos.getText(),txtDireccion.getText(),txtTelefono.getText(),fecha);
+            obj_persona.agregar();
+            tblPersona.setModel(obj_persona.leer());
+            
+        } catch (ParseException ex) {
+            Logger.getLogger(frm_persona.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(frm_persona.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void tbnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbnEliminarActionPerformed
-        // TODO add your handling code here:
+        int opcion = JOptionPane.showConfirmDialog(null, 
+                "¿Desea Eliminar el registro?", "Opcion",JOptionPane.YES_NO_OPTION);
+        if (opcion == 0){
+         obj_persona = new Persona();
+         obj_persona.setNit(txtNit.getText());
+         obj_persona.eliminar();
+         tblPersona.setModel(obj_persona.leer());
+        }
     }//GEN-LAST:event_tbnEliminarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        // TODO add your handling code here:
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date fecha = formato.parse(txtFechaNacimiento.getText());
+            obj_persona=new Persona(txtNit.getText(),txtNombres.getText(),txtApellidos.getText(),txtDireccion.getText(),txtTelefono.getText(),fecha);
+            obj_persona.actualizar();
+            tblPersona.setModel(obj_persona.leer());
+            
+        } catch (ParseException ex) {
+            Logger.getLogger(frm_persona.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
         frm_inicial frm = new frm_inicial();
         frm.setVisible(true);
     }//GEN-LAST:event_btnRegresarActionPerformed
+
+    private void txtNitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNitActionPerformed
 
     /**
      * @param args the command line arguments
@@ -265,7 +324,11 @@ public class frm_persona extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new frm_persona().setVisible(true);
+                try {
+                    new frm_persona().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(frm_persona.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -283,13 +346,13 @@ public class frm_persona extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField tbTelefono;
     private javax.swing.JTable tblPersona;
     private javax.swing.JButton tbnEliminar;
-    private javax.swing.JTextField txtApelllidos;
+    private javax.swing.JTextField txtApellidos;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtFechaNacimiento;
     private javax.swing.JTextField txtNit;
     private javax.swing.JTextField txtNombres;
+    private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 }
